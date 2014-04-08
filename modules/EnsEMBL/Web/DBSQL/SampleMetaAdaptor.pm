@@ -29,48 +29,75 @@ use DBI;
 sub new {
   my ($class, $hub) = @_;
 
-    my $self = {
-    'NAME' => $hub->species_defs->multidb->{'DATABASE_SAMPLE_META'}{'NAME'},
-    'HOST' => $hub->species_defs->multidb->{'DATABASE_SAMPLE_META'}{'HOST'},
-    'PORT' => $hub->species_defs->multidb->{'DATABASE_SAMPLE_META'}{'PORT'},
-    'USER' => $hub->species_defs->multidb->{'DATABASE_SAMPLE_META'}{'USER'},
-    'PASS' => $hub->species_defs->multidb->{'DATABASE_SAMPLE_META'}{'PASS'},
+  my $self =  {
+    NAME => $hub->species_defs->multidb->{DATABASE_SAMPLE_META}{NAME},
+    HOST => $hub->species_defs->multidb->{DATABASE_SAMPLE_META}{HOST},
+    PORT => $hub->species_defs->multidb->{DATABASE_SAMPLE_META}{PORT},
+    USER => $hub->species_defs->multidb->{DATABASE_SAMPLE_META}{USER},
+    PASS => $hub->species_defs->multidb->{DATABASE_SAMPLE_META}{PASS},
   };
+  
   bless $self, $class;
   return $self;
 }
 
 sub db {
   my $self = shift;
-  return unless $self->{'NAME'};
-  $self->{'dbh'} ||= DBI->connect(
-      "DBI:mysql:database=$self->{'NAME'};host=$self->{'HOST'};port=$self->{'PORT'}",
-      $self->{'USER'}, "$self->{'PASS'}"
+  return unless $self->{NAME};
+  $self->{dbh} ||= DBI->connect(
+      "DBI:mysql:database=$self->{NAME};host=$self->{HOST};port=$self->{PORT}",
+      $self->{USER}, 
+      $self->{PASS}
   );
-  return $self->{'dbh'};
+  return $self->{dbh};
 }
 
-sub summary {
+sub get_summary {
   my ($self, $species) = @_;
-  return unless $self->db;
+  return [] unless $self->db;
   
-  my $summary = $self->db->selectcol_arrayref(
+  my $summary = $self->db->selectall_arrayref(
     qq{  
-      SELECT sp.name, s.biosample_group, mk.meta_key, mk.meta_val, 
+      SELECT s.biosample_group, mk.metadata_keyval_id, mk.meta_key, mk.meta_val, 
         COUNT(s.sample_id) AS sample_count, 
         COUNT(im.individual_metadata_id) AS individual_count
-      FROM species sp, sample s, individual_metadata im, metadata_keyval mk
-      WHERE s.species_id = sp.species_id
-        AND im.individual_id = s.sample_id
-        AND im.metadata_keyval_id = mk.metadata_keyval_id
-        AND s.ensembl_individual_id IS NOT NULL
+      FROM species sp
+        JOIN sample s USING (species_id)
+        JOIN individual_metadata im ON im.individual_id = s.sample_id
+        JOIN metadata_keyval mk USING (metadata_keyval_id)
+      WHERE s.ensembl_individual_id IS NOT NULL
+        AND sp.name = ?
       GROUP BY s.species_id, im.metadata_keyval_id
-      ORDER BY sp.name, s.biosample_group, mk.meta_key, mk.meta_val
+      ORDER BY individual_count ASC
     }, 
-    { Slice => {} }
+    { Slice => {} }, 
+    $species
   );
   
   return $summary;
+}
+
+sub get_individuals {
+  my ($self, $species, $metadata_keyval_id) = @_;
+  return [] unless $self->db;
+  
+  my $individuals = $self->db->selectcol_arrayref(
+    qq{  
+      SELECT s.ensembl_individual_name
+      FROM species sp 
+        JOIN sample s USING (species_id) 
+        JOIN individual_metadata im ON im.individual_id = s.sample_id
+        JOIN metadata_keyval mk USING (metadata_keyval_id)
+      WHERE s.ensembl_individual_id IS NOT NULL
+        AND sp.name = ?
+        AND mk.metadata_keyval_id = ?
+    }, 
+    undef,
+    $species, 
+    $metadata_keyval_id
+  );
+  
+  return $individuals;
 }
 
 1;
