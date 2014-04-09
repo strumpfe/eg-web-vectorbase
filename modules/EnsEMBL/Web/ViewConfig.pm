@@ -53,17 +53,18 @@ sub add_individual_selector {
   my $summary                = $self->get_individual_metadata_summary;
   
   my $table = EnsEMBL::Web::Document::Table->new([], [], { 
-    class => 'no_col_toggle data_table ss autocenter',
+    data_table => 'no_col_toggle',
+    exportable => 0,
   });
   
-  $table->code = 'biosamples'; # is this sufficent?
+  $table->code = 'individual_selector';
   
   $table->add_columns(   
     { key => 'biosample_group',  title => 'Group',       width => '10%' },  
     { key => 'meta_key',         title => 'Property',    width => '20%' },  
     { key => 'meta_val',         title => 'Value',       width => '40%' },
-    { key => 'sample_count',     title => 'Samples',     width => '10%' },
-    { key => 'individual_count', title => 'Individuals', width => '10%' },
+    { key => 'sample_count',     title => 'Samples',     width => '10%', sort => 'numeric' },
+    { key => 'individual_count', title => 'Individuals', width => '10%', sort => 'numeric' },
     { key => 'checkbox',         title => '',            width => '10%' },  
   );
   
@@ -104,7 +105,7 @@ sub add_individual_selector {
   my $variations    = $self->species_defs->databases->{'DATABASE_VARIATION'};
   my @strains       = (@{$variations->{'DEFAULT_STRAINS'}}, @{$variations->{'DISPLAY_STRAINS'}});
   my %seen;
-   
+
   foreach my $i (sort @strains) {
     if (!$seen{$i}++) {
       
