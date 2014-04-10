@@ -31,7 +31,7 @@ sub form {
   $self->add_individual_selector({
     checkbox_name_template  => 'opt_pop_%s',
     checkbox_on_value       => 'on',
-  }
+  });
 ##
 
   # Add source selection
