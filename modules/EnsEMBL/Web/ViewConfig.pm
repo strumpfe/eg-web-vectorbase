@@ -52,20 +52,20 @@ sub add_individual_selector {
   my $species                = $hub->species;   
   my $summary                = $self->get_individual_metadata_summary;
   
-  my $table = EnsEMBL::Web::Document::Table->new([], [], { 
+  my $meta_table = EnsEMBL::Web::Document::Table->new([], [], { 
     data_table => 'no_col_toggle',
     exportable => 0,
   });
   
-  $table->code = 'individual_selector';
+  $meta_table->code = 'individual_selector_meta';
   
-  $table->add_columns(   
+  $meta_table->add_columns(   
     { key => 'biosample_group',  title => 'Group',       width => '10%' },  
     { key => 'meta_key',         title => 'Property',    width => '20%' },  
     { key => 'meta_val',         title => 'Value',       width => '40%' },
     { key => 'sample_count',     title => 'Samples',     width => '10%', sort => 'numeric' },
     { key => 'individual_count', title => 'Individuals', width => '10%', sort => 'numeric' },
-    { key => 'checkbox',         title => '',            width => '10%' },  
+    { key => 'checkbox',         title => '',            width => '2%'  },  
   );
   
   my %individual_groups;
@@ -89,7 +89,7 @@ sub add_individual_selector {
       )
     }
        
-    $table->add_row({ 
+    $meta_table->add_row({ 
       biosample_group  => $row->{biosample_group},
       meta_key         => $row->{meta_key},
       meta_val         => $row->{meta_val},
@@ -101,45 +101,70 @@ sub add_individual_selector {
  
   # Selected individuals
   
-  my $fs            = $self->add_fieldset('Selected individuals');
-  my $variations    = $self->species_defs->databases->{'DATABASE_VARIATION'};
-  my @strains       = (@{$variations->{'DEFAULT_STRAINS'}}, @{$variations->{'DISPLAY_STRAINS'}});
+  my $variations = $self->species_defs->databases->{'DATABASE_VARIATION'};
+  my @strains    = (@{$variations->{'DEFAULT_STRAINS'}}, @{$variations->{'DISPLAY_STRAINS'}});
   my %seen;
+
+  my $individual_table = EnsEMBL::Web::Document::Table->new([], [], { 
+    data_table => 'no_col_toggle',
+    exportable => 0,
+  });
+  
+  $individual_table->code = 'individual_selector_individual';
+  
+  $individual_table->add_columns(   
+    { key => 'individual',  title => 'Individual',  width => '20%' },  
+    { key => 'description', title => 'Description', width => '70%' },  
+    { key => 'checkbox',    title => '',            width => '2%'  },  
+  );
 
   foreach my $i (sort @strains) {
     if (!$seen{$i}++) {
       
       my $groups      = $individual_groups{$i};
       my $class       = $groups ? join(' ', map {"ins_group_$_"} @$groups ) : undef;
-      my $description = $variations->{'DISPLAY_STRAIN_DESCRIPTION'}->{$i} || '';
-      $description  &&= qq{<span style="font-weight:normal"> - $description</span>};
-
-
-      $fs->add_field({ 
-        type    => 'CheckBox', 
-        label   => $i . $description,
-        name    => sprintf( $checkbox_name_template, $i ),
-        value   => $checkbox_on_value, 
-        raw     => 1,
-        checked => $self->get($i) eq $checkbox_on_value ? 1 : 0,
-        class   => $class,
-      });
       
-      $self->{'labels'}{$i} ||= $i;
+      my $checkbox = sprintf (
+        qq{<input type="checkbox" class="%s" name="%s" value="%s"%s />}, 
+        $class,
+        sprintf( $checkbox_name_template, $i ),
+        $checkbox_on_value,
+        $self->get($i) eq $checkbox_on_value ? ' checked' : ''
+      );
+      
+      $individual_table->add_row({ 
+        individual => $i,
+        description => $variations->{'DISPLAY_STRAIN_DESCRIPTION'}->{$i},
+        checkbox   => $checkbox,
+      });
+
     }
   }  
+
+  # render
   
-  # Individuals metadata
-    
-  $self->add_fieldset('Individual metadata')->append_child('div', { 
+  $self->add_fieldset('Selected individuals')->append_child('div', { 
     inner_HTML => sprintf (
       qq{
         <div id="IndividualSelector" class="js_panel">
           <input type="hidden" class="subpanel_type" value="IndividualSelector" />
+          <div style="text-align:right;margin-bottom:5px;"><a href="#" class="button">Select / deselect all</a></div>
           %s
         </div>
       },
-      $table->render,
+      $individual_table->render,
+    )
+  });
+  
+  $self->add_fieldset('Individual metadata')->append_child('div', { 
+    inner_HTML => sprintf (
+      qq{
+        <div id="IndividualMetaSelector" class="js_panel">
+          <input type="hidden" class="subpanel_type" value="IndividualMetaSelector" />
+          %s
+        </div>
+      },
+      $meta_table->render,
     )
   });
 }

@@ -8,6 +8,24 @@ Ensembl.Panel.IndividualSelector = Ensembl.Panel.extend({
     this.base.apply(this, arguments);
     var panel = this;
 
+    $('.button', panel.el).click( function() {
+      var checked = $('table input:checkbox', panel.el).prop('checked');
+      $('table input:checkbox', panel.el).prop('checked', checked ? false : true); 
+      return false;
+    });
+  }
+});
+
+Ensembl.Panel.IndividualMetaSelector = Ensembl.Panel.extend({
+  
+  constructor: function (id, params) {
+    this.base.apply(this, arguments);
+  },
+  
+  init: function () {
+    this.base.apply(this, arguments);
+    var panel = this;
+
     $('input[type=checkbox].ins_group', panel.el).click( function() {
       panel.updateSelection(this.name, this.checked);
     });
@@ -29,15 +47,15 @@ Ensembl.Panel.IndividualSelector = Ensembl.Panel.extend({
         }); 
     });
     
-    // check total        
-    var total = $('input[type=checkbox].ins_individual:checked').length;
+    // // check total        
+    // var total = $('input[type=checkbox].ins_individual:checked').length;
     
-    if (total > 100) {
-      alert(
-        'Selecting large groups of individuals may cause this view to become unresponsive or fail - 100 individuals is the suggested maximum.' +
-        '\n\nYou have selected ' + total + ' individuals.'
-      );
-    }
+    // if (total > 100) {
+    //   alert(
+    //     'Selecting large groups of individuals may cause this view to become unresponsive or fail - 100 individuals is the suggested maximum.' +
+    //     '\n\nYou have selected ' + total + ' individuals.'
+    //   );
+    // }
   }
 });
   
