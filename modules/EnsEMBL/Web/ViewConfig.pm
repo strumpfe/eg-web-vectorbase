@@ -109,12 +109,15 @@ sub add_individual_selector {
   foreach my $i (sort @strains) {
     if (!$seen{$i}++) {
       
-      my $groups = $individual_groups{$i};
-      my $class  = $groups ? join(' ', map {"ins_group_$_"} @$groups ) : undef;
-      
+      my $groups      = $individual_groups{$i};
+      my $class       = $groups ? join(' ', map {"ins_group_$_"} @$groups ) : undef;
+      my $description = $variations->{'DISPLAY_STRAIN_DESCRIPTION'}->{$i} || '';
+      $description  &&= qq{<span style="font-weight:normal"> - $description</span>};
+
+
       $fs->add_field({ 
         type    => 'CheckBox', 
-        label   => $i,
+        label   => $i . $description,
         name    => sprintf( $checkbox_name_template, $i ),
         value   => $checkbox_on_value, 
         raw     => 1,

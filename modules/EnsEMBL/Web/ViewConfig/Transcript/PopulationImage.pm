@@ -27,12 +27,13 @@ sub form {
   my %class      = %{$options{'class'}};
   my %type       = %{$options{'type'}};
 
-  # Selected individuals and metadata
+## VB - selected individuals and metadata
   $self->add_individual_selector({
     checkbox_name_template  => 'opt_pop_%s',
     checkbox_on_value       => 'on',
-  });
-  
+  }
+##
+
   # Add source selection
   $self->add_fieldset('Variation source');
   

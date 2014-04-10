@@ -63,30 +63,13 @@ sub form {
   
   $strains .= 's';
 
-  # Selected individuals and metadata
+## VB - selected individuals and metadata
   $self->add_individual_selector({
     checkbox_name_template  => '%s',
     checkbox_on_value       => 'yes',
   });
+##
   
-#  my $fs = $self->add_fieldset("Resequenced $strains"); ## VB
-#  
-#  foreach (sort (@{$variations->{'DEFAULT_STRAINS'} || []}, @{$variations->{'DISPLAY_STRAINS'} || []})) {
-#    next if $_ eq $ref;
-#    
-#    ## VB - bypass add_form_element for performance
-#    $fs->add_field({ 
-#      type  => 'CheckBox', 
-#      label => $_,
-#      name  => $_,
-#      value => 'yes', 
-#      raw   => 1,
-#      checked => $self->get($_) eq 'yes' ? 1 : 0
-#    });
-#    $self->{'labels'}{$_} ||= $_;
-#    ## VB
-#    
-#  } 
 }
 
 1;
