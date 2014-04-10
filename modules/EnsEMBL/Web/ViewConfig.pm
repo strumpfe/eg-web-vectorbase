@@ -146,7 +146,7 @@ sub add_individual_selector {
   $self->add_fieldset('Selected individuals')->append_child('div', { 
     inner_HTML => sprintf (
       qq{
-        <p>Select the individuals you wish to view from the list below. You can norrow the list by typing in the filter box. <b>Please note:</b> selecting large numbers of individuals may cause this view to be come unresponsive - the suggested maximum is 100.</p>            
+        <p>Select the individuals you wish to view from the list below. You can norrow the list by typing in the filter box. <b>Please note:</b> selecting large numbers of individuals may cause this view to become unresponsive - the suggested maximum is 100.</p>            
         <div id="IndividualSelector" class="js_panel">
           <input type="hidden" class="subpanel_type" value="IndividualSelector" />
           <div style="text-align:right;margin-bottom:5px;"><a href="#" class="button">Select / deselect all</a></div>
@@ -160,7 +160,7 @@ sub add_individual_selector {
   $self->add_fieldset('Individual metadata')->append_child('div', { 
     inner_HTML => sprintf (
       qq{
-        <p>Select the groups of individuals you wish to view from the list below. You can norrow the list by typing in the filter box. <b>Please note:</b> selecting large numbers of individuals may cause this view to be come unresponsive - the suggested maximum is 100.</p>
+        <p>Select the groups of individuals you wish to view from the list below. You can norrow the list by typing in the filter box. <b>Please note:</b> selecting large numbers of individuals may cause this view to become unresponsive - the suggested maximum is 100.</p>
         <div id="IndividualMetaSelector" class="js_panel">
           <input type="hidden" class="subpanel_type" value="IndividualMetaSelector" />
           %s
