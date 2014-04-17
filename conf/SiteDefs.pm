@@ -22,6 +22,7 @@ sub update_conf {
   $SiteDefs::APACHE_BIN         = '/usr/sbin/httpd';
   $SiteDefs::APACHE_DIR         = '/etc/httpd';
   $SiteDefs::SAMTOOLS_DIR       = '/nfs/public/rw/ensembl/samtools';
+  $SiteDefs::MWIGGLE_DIR        = '/nfs/public/rw/ensembl/tools/mwiggle/';
 
   $SiteDefs::ENSEMBL_PRIMARY_SPECIES    = 'Glossina_morsitans'; 
   $SiteDefs::ENSEMBL_SECONDARY_SPECIES  = 'Phlebotomus_papatasi';
